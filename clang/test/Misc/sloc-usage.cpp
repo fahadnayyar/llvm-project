@@ -5,7 +5,7 @@
 
 #define FOO(x) x + x
 int k = FOO(FOO(123));
-bool b = EQUALS(k, k);
+bool b = EQUALS(k, k); // expected-warning{{self-comparison always evaluates to true}}
 
 #pragma clang __debug sloc_usage // expected-remark {{address space usage}}
 // expected-note@* {{(0% of available space)}}

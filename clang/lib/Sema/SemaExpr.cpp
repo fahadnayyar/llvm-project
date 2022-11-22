@@ -12083,7 +12083,31 @@ static void diagnoseTautologicalComparison(Sema &S, SourceLocation Loc,
     // non-weak declaration, and so on.
   }
 
-  if (!LHS->getBeginLoc().isMacroID() && !RHS->getBeginLoc().isMacroID()) {
+  bool LhsAndRhsComeFromSameMacro = false;
+  if (LHS->getType()->isIntegerType() && RHS->getType()->isIntegerType() && LHS->getBeginLoc().isMacroID() && RHS->getBeginLoc().isMacroID()) {
+    auto &SrcMngr = S.getASTContext().getSourceManager();
+    auto &LanOpts = S.getASTContext().getLangOpts();
+
+    auto CharRangeLHS = Lexer::getAsCharRange(LHS->getSourceRange(), SrcMngr, LanOpts);
+    CharRangeLHS.setEnd(CharRangeLHS.getEnd().getLocWithOffset(0));
+    auto StringRepLHS = Lexer::getSourceText(CharRangeLHS, SrcMngr, LanOpts);
+
+    auto CharRangeRHS = Lexer::getAsCharRange(RHS->getSourceRange(), SrcMngr, LanOpts);
+    CharRangeRHS.setEnd(CharRangeRHS.getEnd().getLocWithOffset(0));
+    auto StringRepRHS = Lexer::getSourceText(CharRangeRHS, SrcMngr, LanOpts);
+
+    if (StringRepLHS != StringRepRHS) {
+      // Don't check for the warning as the macros are different.
+      LhsAndRhsComeFromSameMacro = false;
+    }
+    else {
+      LhsAndRhsComeFromSameMacro = true;
+      // go ahead and check for the warning.
+      // DOUBT: for the same macro we are always getting StringRepLHS and StringRepRHS "" (empty string)
+    }
+  }
+
+  if ( (!LHS->getBeginLoc().isMacroID() && !RHS->getBeginLoc().isMacroID()) || LhsAndRhsComeFromSameMacro) {
     if (Expr::isSameComparisonOperand(LHS, RHS)) {
       unsigned Result;
       switch (Opc) {
