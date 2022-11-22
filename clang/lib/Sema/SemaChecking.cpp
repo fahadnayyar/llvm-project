@@ -13392,6 +13392,12 @@ static void AnalyzeCompoundAssignment(Sema &S, BinaryOperator *E) {
                         ->getComputationResultType()
                         ->getAs<BuiltinType>();
 
+  // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
+  if (E->getLHS()->getType()->isIntegerType() && E->getRHS()->getType()->isIntegerType() &&
+      (S.Context.getIntWidth(E->getLHS()->getType()) == 32) && (S.Context.getIntWidth(E->getRHS()->getType()) == 64))
+      return DiagnoseImpCast(S, E, E->getRHS()->getType(), E->getLHS()->getType(), 
+          E->getExprLoc(), diag::warn_impcast_integer_64_32, /* pruneControlFlow */ true);
+
   // The below checks assume source is floating point.
   if (!ResultBT || !RBT || !RBT->isFloatingPoint()) return;
 
