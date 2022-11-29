@@ -13393,10 +13393,6 @@ static void AnalyzeCompoundAssignment(Sema &S, BinaryOperator *E) {
                         ->getAs<BuiltinType>();
 
   // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
-  if (E->getLHS()->getType()->isIntegerType() && E->getRHS()->getType()->isIntegerType() &&
-      (S.Context.getIntWidth(E->getLHS()->getType()) == 32) && (S.Context.getIntWidth(E->getRHS()->getType()) == 64))
-      return DiagnoseImpCast(S, E, E->getRHS()->getType(), E->getLHS()->getType(), 
-          E->getExprLoc(), diag::warn_impcast_integer_64_32, /* pruneControlFlow */ true);
 
   // The below checks assume source is floating point.
   if (!ResultBT || !RBT || !RBT->isFloatingPoint()) return;
@@ -14321,7 +14317,12 @@ static void AnalyzeImplicitConversions(
       return AnalyzeAssignment(S, BO);
     // And with compound assignments.
     if (BO->isAssignmentOp())
+    {
+      // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
+      if (BO->getLHS()->getType()->isIntegerType() && BO->getRHS()->getType()->isIntegerType() && !BO->isShiftAssignOp())
+        CheckImplicitConversion(S, BO->getRHS(), BO->getType(), BO->getRHS()->getExprLoc());
       return AnalyzeCompoundAssignment(S, BO);
+    }
   }
 
   // These break the otherwise-useful invariant below.  Fortunately,
