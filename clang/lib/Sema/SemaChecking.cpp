@@ -13374,46 +13374,6 @@ static void DiagnoseFloatingImpCast(Sema &S, Expr *E, QualType T,
   }
 }
 
-/// Analyze the given compound assignment for the possible losing of
-/// floating-point precision.
-static void AnalyzeCompoundAssignment(Sema &S, BinaryOperator *E) {
-  assert(isa<CompoundAssignOperator>(E) &&
-         "Must be compound assignment operation");
-  // Recurse on the LHS and RHS in here
-  AnalyzeImplicitConversions(S, E->getLHS(), E->getOperatorLoc());
-  AnalyzeImplicitConversions(S, E->getRHS(), E->getOperatorLoc());
-
-  if (E->getLHS()->getType()->isAtomicType())
-    S.Diag(E->getOperatorLoc(), diag::warn_atomic_implicit_seq_cst);
-
-  // Now check the outermost expression
-  const auto *ResultBT = E->getLHS()->getType()->getAs<BuiltinType>();
-  const auto *RBT = cast<CompoundAssignOperator>(E)
-                        ->getComputationResultType()
-                        ->getAs<BuiltinType>();
-
-  // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
-
-  // The below checks assume source is floating point.
-  if (!ResultBT || !RBT || !RBT->isFloatingPoint()) return;
-
-  // If source is floating point but target is an integer.
-  if (ResultBT->isInteger())
-    return DiagnoseImpCast(S, E, E->getRHS()->getType(), E->getLHS()->getType(),
-                           E->getExprLoc(), diag::warn_impcast_float_integer);
-
-  if (!ResultBT->isFloatingPoint())
-    return;
-
-  // If both source and target are floating points, warn about losing precision.
-  int Order = S.getASTContext().getFloatingTypeSemanticOrder(
-      QualType(ResultBT, 0), QualType(RBT, 0));
-  if (Order < 0 && !S.SourceMgr.isInSystemMacro(E->getOperatorLoc()))
-    // warn about dropping FP rank.
-    DiagnoseImpCast(S, E->getRHS(), E->getLHS()->getType(), E->getOperatorLoc(),
-                    diag::warn_impcast_float_result_precision);
-}
-
 static std::string PrettyPrintInRange(const llvm::APSInt &Value,
                                       IntRange Range) {
   if (!Range.Width) return "0";
@@ -14152,6 +14112,48 @@ static void CheckImplicitConversion(Sema &S, Expr *E, QualType T,
       }
 }
 
+/// Analyze the given compound assignment for the possible losing of
+/// floating-point precision.
+static void AnalyzeCompoundAssignment(Sema &S, BinaryOperator *E) {
+  assert(isa<CompoundAssignOperator>(E) &&
+         "Must be compound assignment operation");
+  // Recurse on the LHS and RHS in here
+  AnalyzeImplicitConversions(S, E->getLHS(), E->getOperatorLoc());
+  AnalyzeImplicitConversions(S, E->getRHS(), E->getOperatorLoc());
+
+  if (E->getLHS()->getType()->isAtomicType())
+    S.Diag(E->getOperatorLoc(), diag::warn_atomic_implicit_seq_cst);
+
+  // Now check the outermost expression
+  const auto *ResultBT = E->getLHS()->getType()->getAs<BuiltinType>();
+  const auto *RBT = cast<CompoundAssignOperator>(E)
+                        ->getComputationResultType()
+                        ->getAs<BuiltinType>();
+
+  // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
+  if (E->getLHS()->getType()->isIntegerType() && E->getRHS()->getType()->isIntegerType() && !E->isShiftAssignOp())
+    CheckImplicitConversion(S, E->getRHS(), E->getType(), E->getRHS()->getExprLoc());
+
+  // The below checks assume source is floating point.
+  if (!ResultBT || !RBT || !RBT->isFloatingPoint()) return;
+
+  // If source is floating point but target is an integer.
+  if (ResultBT->isInteger())
+    return DiagnoseImpCast(S, E, E->getRHS()->getType(), E->getLHS()->getType(),
+                           E->getExprLoc(), diag::warn_impcast_float_integer);
+
+  if (!ResultBT->isFloatingPoint())
+    return;
+
+  // If both source and target are floating points, warn about losing precision.
+  int Order = S.getASTContext().getFloatingTypeSemanticOrder(
+      QualType(ResultBT, 0), QualType(RBT, 0));
+  if (Order < 0 && !S.SourceMgr.isInSystemMacro(E->getOperatorLoc()))
+    // warn about dropping FP rank.
+    DiagnoseImpCast(S, E->getRHS(), E->getLHS()->getType(), E->getOperatorLoc(),
+                    diag::warn_impcast_float_result_precision);
+}
+
 static void CheckConditionalOperator(Sema &S, AbstractConditionalOperator *E,
                                      SourceLocation CC, QualType T);
 
@@ -14317,12 +14319,7 @@ static void AnalyzeImplicitConversions(
       return AnalyzeAssignment(S, BO);
     // And with compound assignments.
     if (BO->isAssignmentOp())
-    {
-      // Check for implicit conversion loss of precision form 64-to-32 for compound statements.
-      if (BO->getLHS()->getType()->isIntegerType() && BO->getRHS()->getType()->isIntegerType() && !BO->isShiftAssignOp())
-        CheckImplicitConversion(S, BO->getRHS(), BO->getType(), BO->getRHS()->getExprLoc());
       return AnalyzeCompoundAssignment(S, BO);
-    }
   }
 
   // These break the otherwise-useful invariant below.  Fortunately,

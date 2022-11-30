@@ -23,4 +23,6 @@ void test1() {
 void test2() {
   i += (i-j)*ll; // expected-warning {{implicit conversion loses integer precision}}
   i += (i+j)*ll; // expected-warning {{implicit conversion loses integer precision}}
+  i -= ll/(i-j); // expected-warning {{implicit conversion loses integer precision}}
+  i -= ll/(i-j); // expected-warning {{implicit conversion loses integer precision}}
 }
