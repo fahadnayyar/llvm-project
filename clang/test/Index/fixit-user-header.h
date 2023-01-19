@@ -1,4 +1,4 @@
-int func_in_usr_header(char * s, unsigned long len)
+int func_in_user_header(char * s, unsigned long len)
 {
     return 0;
 }
