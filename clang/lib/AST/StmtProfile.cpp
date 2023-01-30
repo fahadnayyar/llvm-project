@@ -39,7 +39,8 @@ namespace {
     void VisitStmt(const Stmt *S);
 
     void VisitStmtNoChildren(const Stmt *S) {
-      HandleStmtClass(S->getStmtClass());
+      if (S->getStmtClass() != Stmt::ParenExprClass)
+        HandleStmtClass(S->getStmtClass());
     }
 
     virtual void HandleStmtClass(Stmt::StmtClass SC) = 0;

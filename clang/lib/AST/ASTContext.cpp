@@ -6345,6 +6345,7 @@ bool ASTContext::hasSameTemplateName(const TemplateName &X,
          getCanonicalTemplateName(Y).getAsVoidPointer();
 }
 
+// IMP
 bool ASTContext::isSameConstraintExpr(const Expr *XCE, const Expr *YCE) const {
   if (!XCE != !YCE)
     return false;

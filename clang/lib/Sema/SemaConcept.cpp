@@ -708,6 +708,7 @@ namespace {
   };
 } // namespace
 
+// MOST IMP
 bool Sema::AreConstraintExpressionsEqual(const NamedDecl *Old,
                                          const Expr *OldConstr,
                                          const NamedDecl *New,
@@ -732,8 +733,65 @@ bool Sema::AreConstraintExpressionsEqual(const NamedDecl *Old,
   }
 
   llvm::FoldingSetNodeID ID1, ID2;
+  
+  // ATTEMPT 3
+  // OldConstr = OldConstr->IgnoreParens();
+  // NewConstr = NewConstr->IgnoreParens();
+  // OldConstr->Profile(ID1, Context, /*Canonical=*/true);
+  // NewConstr->Profile(ID2, Context, /*Canonical=*/true);
+
+  // ATTEMPT 2
+  // struct ParenthesisReplace : TreeTransform<ParenthesisReplace> {
+  //   ParenthesisReplace(Sema &SemaRef) : TreeTransform(SemaRef) {}
+  //   // const Expr * TransformExpr(const Expr *E) {
+  //   //   return E->IgnoreParens();
+  //   // }
+  //   ExprResult TransformExpr(ParenExpr *E) {
+  //     return E->IgnoreParens();
+  //   }
+  // } PT(*this);
+  // ExprResult OldConstrRslt = PT.TransformExpr((ParenExpr *)OldConstr);
+  // ExprResult NewConstrRslt = PT.TransformExpr((ParenExpr *)NewConstr);
+  // OldConstrRslt.get()->Profile(ID1, Context, /*Canonical=*/true);
+  // NewConstrRslt.get()->Profile(ID2, Context, /*Canonical=*/true);
+  
+
+  // ATTEMPT 1
+  // struct ParenthesisReplace : TreeTransform<ParenthesisReplace> {
+  //   ParenthesisReplace(Sema &SemaRef) : TreeTransform(SemaRef) {}
+  //   // const Expr * TransformExpr(const Expr *E) {
+  //   //   return E->IgnoreParens();
+  //   // }
+  //   ExprResult TransformExpr(Expr *E) {
+  //     return E->IgnoreParens();
+  //   }
+  // } PT(*this);
+  // ExprResult OldConstrRslt = PT.TransformExpr((Expr *)OldConstr);
+  // ExprResult NewConstrRslt = PT.TransformExpr((Expr *)NewConstr);
+  // OldConstrRslt.get()->Profile(ID1, Context, /*Canonical=*/true);
+  // NewConstrRslt.get()->Profile(ID2, Context, /*Canonical=*/true);
+    
+  // ATTEMPT 0
+  // OldConstr->IgnoreParens()->Profile(ID1, Context, /*Canonical=*/true);
+
+  // ORIGINAL
   OldConstr->Profile(ID1, Context, /*Canonical=*/true);
   NewConstr->Profile(ID2, Context, /*Canonical=*/true);
+  
+  // DEBUGGING:
+  // llvm::errs() << "ID1: ";
+  // for (unsigned bb : ID1.Bits)
+  // {
+  //   llvm::errs() << bb << ", ";
+  // }
+  // llvm::errs() << "\n\nID2: ";
+  // for (unsigned bb : ID2.Bits)
+  // {
+  //   llvm::errs() << bb << ", ";
+  // }
+  // llvm::errs() << "\n";
+
+  // MOST IMO: why ID1 != ID2 for () case?
   return ID1 == ID2;
 }
 
