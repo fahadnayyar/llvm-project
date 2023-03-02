@@ -686,6 +686,7 @@ libcxx/include/__type_traits/is_floating_point.h
 libcxx/include/__type_traits/is_fundamental.h
 libcxx/include/__type_traits/is_implicitly_default_constructible.h
 libcxx/include/__type_traits/is_integral.h
+libcxx/include/__type_traits/is_layout_compatible.h
 libcxx/include/__type_traits/is_literal_type.h
 libcxx/include/__type_traits/is_member_function_pointer.h
 libcxx/include/__type_traits/is_member_object_pointer.h
@@ -715,7 +716,6 @@ libcxx/include/__type_traits/is_scoped_enum.h
 libcxx/include/__type_traits/is_signed.h
 libcxx/include/__type_traits/is_signed_integer.h
 libcxx/include/__type_traits/is_standard_layout.h
-libcxx/include/__type_traits/is_layout_compatible.h
 libcxx/include/__type_traits/is_swappable.h
 libcxx/include/__type_traits/is_trivial.h
 libcxx/include/__type_traits/is_trivially_assignable.h

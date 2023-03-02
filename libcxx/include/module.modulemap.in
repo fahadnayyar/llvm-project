@@ -1504,6 +1504,7 @@ module std [system] {
     module is_fundamental                      { private header "__type_traits/is_fundamental.h" }
     module is_implicitly_default_constructible { private header "__type_traits/is_implicitly_default_constructible.h" }
     module is_integral                         { private header "__type_traits/is_integral.h" }
+    module is_layout_compatible                { private header "__type_traits/is_layout_compatible.h" }
     module is_literal_type                     { private header "__type_traits/is_literal_type.h" }
     module is_member_function_pointer          { private header "__type_traits/is_member_function_pointer.h" }
     module is_member_object_pointer            { private header "__type_traits/is_member_object_pointer.h" }
@@ -1538,7 +1539,6 @@ module std [system] {
     module is_signed_integer                   { private header "__type_traits/is_signed_integer.h" }
     module is_specialization                   { private header "__type_traits/is_specialization.h" }
     module is_standard_layout                  { private header "__type_traits/is_standard_layout.h" }
-    module is_layout_compatible                  { private header "__type_traits/is_layout_compatible.h" }
     module is_swappable                        { private header "__type_traits/is_swappable.h" }
     module is_trivial                          { private header "__type_traits/is_trivial.h" }
     module is_trivially_assignable             { private header "__type_traits/is_trivially_assignable.h" }

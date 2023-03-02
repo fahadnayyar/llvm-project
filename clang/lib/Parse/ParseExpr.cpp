@@ -868,7 +868,6 @@ class CastExpressionIdValidator final : public CorrectionCandidateCallback {
 ///                   '__is_volatile'
 ///                   '__is_trivial'
 ///                   '__is_standard_layout'
-///                   '__is_layout_compatible'
 ///                   '__is_signed'
 ///                   '__is_unsigned'
 ///
@@ -901,6 +900,7 @@ class CastExpressionIdValidator final : public CorrectionCandidateCallback {
 /// [GNU]             '__is_base_of'
 /// [MS]              '__is_convertible_to'
 ///                   '__is_convertible'
+///                   '__is_layout_compatible'
 ///                   '__is_same'
 ///
 /// [Embarcadero] array-type-trait:
@@ -1092,6 +1092,7 @@ ExprResult Parser::ParseCastExpression(CastParseKind ParseKind,
           REVERTIBLE_TYPE_TRAIT(__is_fundamental);
           REVERTIBLE_TYPE_TRAIT(__is_integral);
           REVERTIBLE_TYPE_TRAIT(__is_interface_class);
+          REVERTIBLE_TYPE_TRAIT(__is_layout_compatible);
           REVERTIBLE_TYPE_TRAIT(__is_literal);
           REVERTIBLE_TYPE_TRAIT(__is_lvalue_expr);
           REVERTIBLE_TYPE_TRAIT(__is_lvalue_reference);
@@ -1116,7 +1117,6 @@ ExprResult Parser::ParseCastExpression(CastParseKind ParseKind,
           REVERTIBLE_TYPE_TRAIT(__is_sealed);
           REVERTIBLE_TYPE_TRAIT(__is_signed);
           REVERTIBLE_TYPE_TRAIT(__is_standard_layout);
-          REVERTIBLE_TYPE_TRAIT(__is_layout_compatible);
           REVERTIBLE_TYPE_TRAIT(__is_trivial);
           REVERTIBLE_TYPE_TRAIT(__is_trivially_assignable);
           REVERTIBLE_TYPE_TRAIT(__is_trivially_constructible);

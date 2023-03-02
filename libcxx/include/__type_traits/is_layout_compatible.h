@@ -22,7 +22,7 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 template <class _Tp, class _Up>
 struct _LIBCPP_TEMPLATE_VIS is_layout_compatible : public integral_constant<bool, __is_layout_compatible(_Tp, _Up)> {};
 
-#if _LIBCPP_STD_VER >= 20
+#if _LIBCPP_STD_VER >= 17
 template <class _Tp, class _Up>
 inline constexpr bool is_layout_compatible_v = __is_layout_compatible(_Tp, _Up);
 #endif

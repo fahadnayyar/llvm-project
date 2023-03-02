@@ -659,6 +659,7 @@ END-SCRIPT
 #include <__type_traits/is_implicitly_default_constructible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_implicitly_default_constructible.h'}}
 #include <__type_traits/is_integral.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_integral.h'}}
 #include <__type_traits/is_literal_type.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_literal_type.h'}}
+#include <__type_traits/is_layout_compatible.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_layout_compatible.h'}}
 #include <__type_traits/is_member_function_pointer.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_member_function_pointer.h'}}
 #include <__type_traits/is_member_object_pointer.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_member_object_pointer.h'}}
 #include <__type_traits/is_member_pointer.h> // expected-error@*:* {{use of private header from outside its module: '__type_traits/is_member_pointer.h'}}

@@ -8,17 +8,17 @@
 
 #include <type_traits>
 
-struct Foo {
-  int x;
-  char y;
-};
+// struct Foo {
+//   int x;
+//   char y;
+// };
 
-class Bar {
-  const int u     = 42;
-  volatile char v = '*';
-};
+// class Bar {
+//   const int u     = 42;
+//   volatile char v = '*';
+// };
 
-enum E0 : int {};
-enum class E1 : int {};
+// enum E0 : int {};
+// enum class E1 : int {};
 
 static_assert(std::is_layout_compatible_v<const void, volatile void>, "");
