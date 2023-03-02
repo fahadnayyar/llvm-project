@@ -868,6 +868,7 @@ class CastExpressionIdValidator final : public CorrectionCandidateCallback {
 ///                   '__is_volatile'
 ///                   '__is_trivial'
 ///                   '__is_standard_layout'
+///                   '__is_layout_compatible'
 ///                   '__is_signed'
 ///                   '__is_unsigned'
 ///
@@ -1115,6 +1116,7 @@ ExprResult Parser::ParseCastExpression(CastParseKind ParseKind,
           REVERTIBLE_TYPE_TRAIT(__is_sealed);
           REVERTIBLE_TYPE_TRAIT(__is_signed);
           REVERTIBLE_TYPE_TRAIT(__is_standard_layout);
+          REVERTIBLE_TYPE_TRAIT(__is_layout_compatible);
           REVERTIBLE_TYPE_TRAIT(__is_trivial);
           REVERTIBLE_TYPE_TRAIT(__is_trivially_assignable);
           REVERTIBLE_TYPE_TRAIT(__is_trivially_constructible);

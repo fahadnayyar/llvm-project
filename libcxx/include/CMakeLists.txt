@@ -676,6 +676,7 @@ set(files
   __type_traits/is_signed_integer.h
   __type_traits/is_specialization.h
   __type_traits/is_standard_layout.h
+  __type_traits/is_layout_compatible.h
   __type_traits/is_swappable.h
   __type_traits/is_trivial.h
   __type_traits/is_trivially_assignable.h

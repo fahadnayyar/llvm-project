@@ -1494,6 +1494,7 @@ The following type trait primitives are supported by Clang. Those traits marked
   Returns false for enumeration types, and returns true for floating-point
   types. Note, before Clang 10, returned true for enumeration types if the
   underlying type was signed, and returned false for floating-point types.
+// Not sure what to do here.
 * ``__is_standard_layout`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_trivial`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_trivially_assignable`` (C++, GNU, Microsoft)
@@ -1553,6 +1554,7 @@ compiler, depending on the oldest version of Clang you wish to support.
   * ``__is_enum``
   * ``__is_final``
   * ``__is_literal``
+// Not sure what to do here.
   * ``__is_standard_layout``
   * ``__is_pod``
   * ``__is_polymorphic``

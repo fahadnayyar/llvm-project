@@ -56,10 +56,12 @@ const ASTNodeKind::KindInfo ASTNodeKind::AllKindInfo[] = {
     {NKI_None, "ObjCProtocolLoc"},
 };
 
+// IMP
 bool ASTNodeKind::isBaseOf(ASTNodeKind Other, unsigned *Distance) const {
   return isBaseOf(KindId, Other.KindId, Distance);
 }
 
+// IMP
 bool ASTNodeKind::isBaseOf(NodeKindId Base, NodeKindId Derived,
                            unsigned *Distance) {
   if (Base == NKI_None || Derived == NKI_None) return false;

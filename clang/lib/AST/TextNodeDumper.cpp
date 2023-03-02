@@ -1982,6 +1982,8 @@ void TextNodeDumper::VisitCXXRecordDecl(const CXXRecordDecl *D) {
     FLAG(isEmpty, empty);
     FLAG(isAggregate, aggregate);
     FLAG(isStandardLayout, standard_layout);
+    // FLAG(isLayoutCompatible, layout_compatible);
+    // DO something here?
     FLAG(isTriviallyCopyable, trivially_copyable);
     FLAG(isPOD, pod);
     FLAG(isTrivial, trivial);

@@ -11,6 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "clang/Sema/SemaChecking.h"
 #include "clang/AST/APValue.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Attr.h"
@@ -17257,10 +17258,11 @@ void Sema::DiagnoseSelfMove(const Expr *LHSExpr, const Expr *RHSExpr,
 
 //===--- Layout compatibility ----------------------------------------------//
 
-static bool isLayoutCompatible(ASTContext &C, QualType T1, QualType T2);
+// IMP
+bool isLayoutCompatible(ASTContext &C, QualType T1, QualType T2);
 
 /// Check if two enumeration types are layout-compatible.
-static bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
+bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
   // C++11 [dcl.enum] p8:
   // Two enumeration types are layout-compatible if they have the same
   // underlying type.
@@ -17269,8 +17271,7 @@ static bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
 }
 
 /// Check if two fields are layout-compatible.
-static bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1,
-                               FieldDecl *Field2) {
+bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1, FieldDecl *Field2) {
   if (!isLayoutCompatible(C, Field1->getType(), Field2->getType()))
     return false;
 
@@ -17291,8 +17292,7 @@ static bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1,
 
 /// Check if two standard-layout structs are layout-compatible.
 /// (C++11 [class.mem] p17)
-static bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1,
-                                     RecordDecl *RD2) {
+bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   // If both records are C++ classes, check that base classes match.
   if (const CXXRecordDecl *D1CXX = dyn_cast<CXXRecordDecl>(RD1)) {
     // If one of records is a CXXRecordDecl we are in C++ mode,
@@ -17324,6 +17324,7 @@ static bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1,
                              Field1 = RD1->field_begin(),
                              Field1End = RD1->field_end();
   for ( ; Field1 != Field1End && Field2 != Field2End; ++Field1, ++Field2) {
+    // HERE is the problem for 2nd case.
     if (!isLayoutCompatible(C, *Field1, *Field2))
       return false;
   }
@@ -17335,8 +17336,7 @@ static bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1,
 
 /// Check if two standard-layout unions are layout-compatible.
 /// (C++11 [class.mem] p18)
-static bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1,
-                                    RecordDecl *RD2) {
+bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   llvm::SmallPtrSet<FieldDecl *, 8> UnmatchedFields;
   for (auto *Field2 : RD2->fields())
     UnmatchedFields.insert(Field2);
@@ -17361,8 +17361,7 @@ static bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1,
   return UnmatchedFields.empty();
 }
 
-static bool isLayoutCompatible(ASTContext &C, RecordDecl *RD1,
-                               RecordDecl *RD2) {
+bool isLayoutCompatible(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   if (RD1->isUnion() != RD2->isUnion())
     return false;
 
@@ -17373,18 +17372,18 @@ static bool isLayoutCompatible(ASTContext &C, RecordDecl *RD1,
 }
 
 /// Check if two types are layout-compatible in C++11 sense.
-static bool isLayoutCompatible(ASTContext &C, QualType T1, QualType T2) {
+bool isLayoutCompatible(ASTContext &C, QualType T1, QualType T2) {
   if (T1.isNull() || T2.isNull())
     return false;
+
+  T1 = T1.getCanonicalType().getUnqualifiedType();
+  T2 = T2.getCanonicalType().getUnqualifiedType();
 
   // C++11 [basic.types] p11:
   // If two types T1 and T2 are the same type, then T1 and T2 are
   // layout-compatible types.
   if (C.hasSameType(T1, T2))
     return true;
-
-  T1 = T1.getCanonicalType().getUnqualifiedType();
-  T2 = T2.getCanonicalType().getUnqualifiedType();
 
   const Type::TypeClass TC1 = T1->getTypeClass();
   const Type::TypeClass TC2 = T2->getTypeClass();

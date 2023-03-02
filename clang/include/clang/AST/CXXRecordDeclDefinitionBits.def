@@ -60,6 +60,8 @@ FIELD(Polymorphic, 1, NO_MERGE)
 /// one pure virtual function, (that can come from a base class).
 FIELD(Abstract, 1, NO_MERGE)
 
+// Not sure what to do here.
+
 /// True when this class is standard-layout, per the applicable
 /// language rules (including DRs).
 FIELD(IsStandardLayout, 1, NO_MERGE)

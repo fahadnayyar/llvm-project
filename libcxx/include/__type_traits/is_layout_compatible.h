@@ -1,4 +1,4 @@
-// IMP file: read it!
+// FN_TODO: recheck this file!
 //===----------------------------------------------------------------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
@@ -7,8 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef _LIBCPP___TYPE_TRAITS_IS_STANDARD_LAYOUT_H
-#define _LIBCPP___TYPE_TRAITS_IS_STANDARD_LAYOUT_H
+#ifndef _LIBCPP___TYPE_TRAITS_IS_LAYOUT_COMPATIBLE_H
+#define _LIBCPP___TYPE_TRAITS_IS_LAYOUT_COMPATIBLE_H
 
 #include <__config>
 #include <__type_traits/integral_constant.h>
@@ -19,15 +19,14 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-template <class _Tp> struct _LIBCPP_TEMPLATE_VIS is_standard_layout
-    : public integral_constant<bool, __is_standard_layout(_Tp)>
-    {};
+template <class _Tp, class _Up>
+struct _LIBCPP_TEMPLATE_VIS is_layout_compatible : public integral_constant<bool, __is_layout_compatible(_Tp, _Up)> {};
 
-#if _LIBCPP_STD_VER >= 17
-template <class _Tp>
-inline constexpr bool is_standard_layout_v = __is_standard_layout(_Tp);
+#if _LIBCPP_STD_VER >= 20
+template <class _Tp, class _Up>
+inline constexpr bool is_layout_compatible_v = __is_layout_compatible(_Tp, _Up);
 #endif
 
 _LIBCPP_END_NAMESPACE_STD
 
-#endif // _LIBCPP___TYPE_TRAITS_IS_STANDARD_LAYOUT_H
+#endif // _LIBCPP___TYPE_TRAITS_IS_LAYOUT_COMPATIBLE_H

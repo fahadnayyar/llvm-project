@@ -36,6 +36,7 @@
 #include "clang/Sema/ParsedTemplate.h"
 #include "clang/Sema/Scope.h"
 #include "clang/Sema/ScopeInfo.h"
+#include "clang/Sema/SemaChecking.h"
 #include "clang/Sema/SemaInternal.h"
 #include "clang/Sema/SemaLambda.h"
 #include "clang/Sema/Template.h"
@@ -5657,6 +5658,12 @@ static bool EvaluateBinaryTypeTrait(Sema &Self, TypeTrait BTT, QualType LhsT,
 
     return cast<CXXRecordDecl>(rhsRecord->getDecl())
       ->isDerivedFrom(cast<CXXRecordDecl>(lhsRecord->getDecl()));
+  }
+  case BTT_IsLayoutCompatible: {
+    bool result = isLayoutCompatible(Self.getASTContext(), LhsT, RhsT);
+    llvm::errs() << "result: " << result << " \n";
+    return result;
+    // return false;
   }
   case BTT_IsSame:
     return Self.Context.hasSameType(LhsT, RhsT);

@@ -3776,3 +3776,29 @@ void remove_all_extents() {
   using SomeArray = int[1][2];
   static_assert(__is_same(remove_all_extents_t<const SomeArray>, const int), "");
 }
+
+namespace is_layout_compatible_tests {
+  struct Foo {
+      int x;
+      char y;
+  };
+  
+  class Bar {
+      const int u = 42;
+      volatile char v = '*';
+  };
+  
+  enum E0 : int {};
+  enum class E1 : int {};
+  
+  void is_layout_compatible_test() {
+    static_assert(__is_layout_compatible(const void, volatile void), "");
+    static_assert(__is_layout_compatible(Foo, Bar), "");
+    static_assert(!__is_layout_compatible(Foo[2], Bar[2]), "");
+    static_assert(!__is_layout_compatible(int, E0), "");
+    static_assert(__is_layout_compatible(E0, E1), "");
+    static_assert(!__is_layout_compatible(long, unsigned long), "");
+    static_assert(!__is_layout_compatible(char*, const char*), "");
+    static_assert(__is_layout_compatible(char*, char* const), "");
+  }
+}
