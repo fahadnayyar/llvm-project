@@ -5660,10 +5660,7 @@ static bool EvaluateBinaryTypeTrait(Sema &Self, TypeTrait BTT, QualType LhsT,
       ->isDerivedFrom(cast<CXXRecordDecl>(lhsRecord->getDecl()));
   }
   case BTT_IsLayoutCompatible: {
-    bool result = isLayoutCompatible(Self.getASTContext(), LhsT, RhsT);
-    llvm::errs() << "result: " << result << " \n";
-    return result;
-    // return false;
+    return isLayoutCompatible(Self.getASTContext(), LhsT, RhsT);
   }
   case BTT_IsSame:
     return Self.Context.hasSameType(LhsT, RhsT);

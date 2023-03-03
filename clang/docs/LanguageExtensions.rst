@@ -1457,6 +1457,7 @@ The following type trait primitives are supported by Clang. Those traits marked
 * ``__is_integral`` (C++, Embarcadero)
 * ``__is_interface_class`` (Microsoft):
   Returns ``false``, even for types defined with ``__interface``.
+* ``__is_layout_compatible`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_literal`` (Clang):
   Synonym for ``__is_literal_type``.
 * ``__is_literal_type`` (C++, GNU, Microsoft):
@@ -1494,7 +1495,6 @@ The following type trait primitives are supported by Clang. Those traits marked
   Returns false for enumeration types, and returns true for floating-point
   types. Note, before Clang 10, returned true for enumeration types if the
   underlying type was signed, and returned false for floating-point types.
-// Not sure what to do here.
 * ``__is_standard_layout`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_trivial`` (C++, GNU, Microsoft, Embarcadero)
 * ``__is_trivially_assignable`` (C++, GNU, Microsoft)
@@ -1553,8 +1553,8 @@ compiler, depending on the oldest version of Clang you wish to support.
   * ``__is_empty``
   * ``__is_enum``
   * ``__is_final``
+  * ``__is_layout_compatible``
   * ``__is_literal``
-// Not sure what to do here.
   * ``__is_standard_layout``
   * ``__is_pod``
   * ``__is_polymorphic``

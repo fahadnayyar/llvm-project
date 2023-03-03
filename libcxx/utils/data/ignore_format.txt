@@ -686,7 +686,6 @@ libcxx/include/__type_traits/is_floating_point.h
 libcxx/include/__type_traits/is_fundamental.h
 libcxx/include/__type_traits/is_implicitly_default_constructible.h
 libcxx/include/__type_traits/is_integral.h
-libcxx/include/__type_traits/is_layout_compatible.h
 libcxx/include/__type_traits/is_literal_type.h
 libcxx/include/__type_traits/is_member_function_pointer.h
 libcxx/include/__type_traits/is_member_object_pointer.h

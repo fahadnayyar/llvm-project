@@ -17258,11 +17258,10 @@ void Sema::DiagnoseSelfMove(const Expr *LHSExpr, const Expr *RHSExpr,
 
 //===--- Layout compatibility ----------------------------------------------//
 
-// IMP
 bool isLayoutCompatible(ASTContext &C, QualType T1, QualType T2);
 
 /// Check if two enumeration types are layout-compatible.
-bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
+static bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
   // C++11 [dcl.enum] p8:
   // Two enumeration types are layout-compatible if they have the same
   // underlying type.
@@ -17271,7 +17270,7 @@ bool isLayoutCompatible(ASTContext &C, EnumDecl *ED1, EnumDecl *ED2) {
 }
 
 /// Check if two fields are layout-compatible.
-bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1, FieldDecl *Field2) {
+static bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1, FieldDecl *Field2) {
   if (!isLayoutCompatible(C, Field1->getType(), Field2->getType()))
     return false;
 
@@ -17292,7 +17291,7 @@ bool isLayoutCompatible(ASTContext &C, FieldDecl *Field1, FieldDecl *Field2) {
 
 /// Check if two standard-layout structs are layout-compatible.
 /// (C++11 [class.mem] p17)
-bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
+static bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   // If both records are C++ classes, check that base classes match.
   if (const CXXRecordDecl *D1CXX = dyn_cast<CXXRecordDecl>(RD1)) {
     // If one of records is a CXXRecordDecl we are in C++ mode,
@@ -17324,7 +17323,6 @@ bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
                              Field1 = RD1->field_begin(),
                              Field1End = RD1->field_end();
   for ( ; Field1 != Field1End && Field2 != Field2End; ++Field1, ++Field2) {
-    // HERE is the problem for 2nd case.
     if (!isLayoutCompatible(C, *Field1, *Field2))
       return false;
   }
@@ -17336,7 +17334,7 @@ bool isLayoutCompatibleStruct(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
 
 /// Check if two standard-layout unions are layout-compatible.
 /// (C++11 [class.mem] p18)
-bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
+static bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   llvm::SmallPtrSet<FieldDecl *, 8> UnmatchedFields;
   for (auto *Field2 : RD2->fields())
     UnmatchedFields.insert(Field2);
@@ -17361,7 +17359,7 @@ bool isLayoutCompatibleUnion(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   return UnmatchedFields.empty();
 }
 
-bool isLayoutCompatible(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
+static bool isLayoutCompatible(ASTContext &C, RecordDecl *RD1, RecordDecl *RD2) {
   if (RD1->isUnion() != RD2->isUnion())
     return false;
 
