@@ -410,6 +410,21 @@ void darwin::Linker::AddLinkArgs(Compilation &C, const ArgList &Args,
   Args.AddAllArgs(CmdArgs, options::OPT_sub__library);
   Args.AddAllArgs(CmdArgs, options::OPT_sub__umbrella);
 
+  // Including the path to the just-built libc++.dylib if libc++ is bootstrapped
+  // and installed in <install>/include/c++/v1
+
+  llvm::SmallString<128> LibCXXIncludePath =
+      llvm::StringRef(D.getInstalledDir()); // <install>/bin
+  llvm::sys::path::append(LibCXXIncludePath, "..", "include", "c++", "v1");
+
+  if (D.getVFS().exists(LibCXXIncludePath)) {    
+    llvm::SmallString<128> LibCXXDylibPath =
+        llvm::StringRef(D.getInstalledDir()); // <install>/bin
+    llvm::sys::path::append(LibCXXDylibPath, "..", "lib");    
+    CmdArgs.push_back("-L");
+    CmdArgs.push_back(C.getArgs().MakeArgString(LibCXXDylibPath));
+  }
+
   // Give --sysroot= preference, over the Apple specific behavior to also use
   // --isysroot as the syslibroot.
   StringRef sysroot = C.getSysRoot();
