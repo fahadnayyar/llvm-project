@@ -413,16 +413,19 @@ void darwin::Linker::AddLinkArgs(Compilation &C, const ArgList &Args,
   // Including the path to the just-built libc++.dylib if libc++ is bootstrapped
   // and installed in <install>/include/c++/v1
 
-  llvm::SmallString<128> LibCXXIncludePath =
-      llvm::StringRef(D.getInstalledDir()); // <install>/bin
-  llvm::sys::path::append(LibCXXIncludePath, "..", "include", "c++", "v1");
-
-  if (D.getVFS().exists(LibCXXIncludePath)) {    
-    llvm::SmallString<128> LibCXXDylibPath =
+  llvm::SmallString<128> LibCXXDylibDirPath =
         llvm::StringRef(D.getInstalledDir()); // <install>/bin
-    llvm::sys::path::append(LibCXXDylibPath, "..", "lib");    
+  llvm::sys::path::append(LibCXXDylibDirPath, "..", "lib");
+  
+  llvm::SmallString<128> LibCXXDylibPath = LibCXXDylibDirPath;
+  llvm::sys::path::append(LibCXXDylibPath, "..", "lib", "libc++.dylib");
+
+  llvm::errs() << "LibCXXDylibPath: " << LibCXXDylibPath << "\n" ;
+  llvm::errs() << "LibCXXDylibDirPath: " << LibCXXDylibDirPath << "\n" ;
+
+  if (D.getVFS().exists(LibCXXDylibPath)) {            
     CmdArgs.push_back("-L");
-    CmdArgs.push_back(C.getArgs().MakeArgString(LibCXXDylibPath));
+    CmdArgs.push_back(C.getArgs().MakeArgString(LibCXXDylibDirPath));
   }
 
   // Give --sysroot= preference, over the Apple specific behavior to also use
