@@ -411,19 +411,16 @@ void darwin::Linker::AddLinkArgs(Compilation &C, const ArgList &Args,
   Args.AddAllArgs(CmdArgs, options::OPT_sub__umbrella);
 
   // Including the path to the just-built libc++.dylib if libc++ is bootstrapped
-  // and installed in <install>/include/c++/v1
+  // and <install>/bin/../lib/libc++.dylib is a valid path
 
   llvm::SmallString<128> LibCXXDylibDirPath =
-        llvm::StringRef(D.getInstalledDir()); // <install>/bin
+      llvm::StringRef(D.getInstalledDir()); // <install>/bin
   llvm::sys::path::append(LibCXXDylibDirPath, "..", "lib");
-  
+
   llvm::SmallString<128> LibCXXDylibPath = LibCXXDylibDirPath;
   llvm::sys::path::append(LibCXXDylibPath, "..", "lib", "libc++.dylib");
 
-  llvm::errs() << "LibCXXDylibPath: " << LibCXXDylibPath << "\n" ;
-  llvm::errs() << "LibCXXDylibDirPath: " << LibCXXDylibDirPath << "\n" ;
-
-  if (D.getVFS().exists(LibCXXDylibPath)) {            
+  if (D.getVFS().exists(LibCXXDylibPath)) {
     CmdArgs.push_back("-L");
     CmdArgs.push_back(C.getArgs().MakeArgString(LibCXXDylibDirPath));
   }
