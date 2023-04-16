@@ -410,19 +410,27 @@ void darwin::Linker::AddLinkArgs(Compilation &C, const ArgList &Args,
   Args.AddAllArgs(CmdArgs, options::OPT_sub__library);
   Args.AddAllArgs(CmdArgs, options::OPT_sub__umbrella);
 
-  // Including the path to the just-built libc++.dylib if libc++ is bootstrapped
-  // and <install>/bin/../lib/libc++.dylib is a valid path
-
-  llvm::SmallString<128> LibCXXDylibDirPath =
+  // If the toolchain contains libc++.dylib (in
+  // <install>/bin/../lib/libc++.dylib), use that instead of the
+  // sysroot-provided one. This matches what we do for determining which libc++
+  // headers to use.
+  llvm::SmallString<128> InstallBinPath =
       llvm::StringRef(D.getInstalledDir()); // <install>/bin
-  llvm::sys::path::append(LibCXXDylibDirPath, "..", "lib");
-
-  llvm::SmallString<128> LibCXXDylibPath = LibCXXDylibDirPath;
-  llvm::sys::path::append(LibCXXDylibPath, "..", "lib", "libc++.dylib");
-
-  if (D.getVFS().exists(LibCXXDylibPath)) {
+  llvm::SmallString<128> LibCxxHeadersPath = InstallBinPath;
+  llvm::sys::path::append(LibCxxHeadersPath, "..", "include", "c++",
+                          "v1"); // <install>/bin/../include/c++/v1
+  llvm::SmallString<128> LibCxxDylibDirPath = InstallBinPath;
+  llvm::sys::path::append(LibCxxDylibDirPath, "..",
+                          "lib"); // <install>/bin/../lib
+  llvm::SmallString<128> LibCxxDylibPath = LibCxxDylibDirPath;
+  llvm::sys::path::append(LibCxxDylibPath,
+                          "libc++.dylib"); // <install>/bin/../lib/libc++.dylib
+  // Checking if paths to both the libc++ headers and libc++.dylib in the
+  // toolchain are valid
+  if (D.getVFS().exists(LibCxxDylibPath) &&
+      D.getVFS().exists(LibCxxHeadersPath)) {
     CmdArgs.push_back("-L");
-    CmdArgs.push_back(C.getArgs().MakeArgString(LibCXXDylibDirPath));
+    CmdArgs.push_back(C.getArgs().MakeArgString(LibCxxDylibDirPath));
   }
 
   // Give --sysroot= preference, over the Apple specific behavior to also use
@@ -2457,8 +2465,14 @@ void DarwinClang::AddClangCXXStdlibIncludeArgs(
     // parent_path.
     llvm::SmallString<128> InstallBin =
         llvm::StringRef(getDriver().getInstalledDir()); // <install>/bin
+    llvm::SmallString<128> LibCxxDylibPath = InstallBin;
+    llvm::sys::path::append(
+        LibCxxDylibPath, "..", "lib",
+        "libc++.dylib"); // <install>/bin/../lib/libc++.dylib
     llvm::sys::path::append(InstallBin, "..", "include", "c++", "v1");
-    if (getVFS().exists(InstallBin)) {
+    // Checking if paths to both the libc++ headers and libc++.dylib in the
+    // toolchain are valid.
+    if (getVFS().exists(InstallBin) && getVFS().exists(LibCxxDylibPath)) {
       addSystemInclude(DriverArgs, CC1Args, InstallBin);
       return;
     } else if (DriverArgs.hasArg(options::OPT_v)) {
