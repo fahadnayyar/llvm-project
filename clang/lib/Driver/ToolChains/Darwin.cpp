@@ -425,9 +425,12 @@ void darwin::Linker::AddLinkArgs(Compilation &C, const ArgList &Args,
   llvm::SmallString<128> LibCxxDylibPath = LibCxxDylibDirPath;
   llvm::sys::path::append(LibCxxDylibPath,
                           "libc++.dylib"); // <install>/bin/../lib/libc++.dylib
-  // Checking if paths to both the libc++ headers and libc++.dylib in the
-  // toolchain are valid
-  if (D.getVFS().exists(LibCxxDylibPath) &&
+  // Checking the absence -nostdinc, -nostdinc++ or -nostdlib arguments
+  // arguments and the validity of paths to both the libc++ headers and
+  // libc++.dylib in the toolchain.
+  if ((!Args.hasArg(options::OPT_nostdinc, options::OPT_nostdlibinc,
+                    options::OPT_nostdincxx)) &&
+      D.getVFS().exists(LibCxxDylibPath) &&
       D.getVFS().exists(LibCxxHeadersPath)) {
     CmdArgs.push_back("-L");
     CmdArgs.push_back(C.getArgs().MakeArgString(LibCxxDylibDirPath));
