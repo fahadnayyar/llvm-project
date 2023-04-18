@@ -116,7 +116,7 @@
 // RUN:     -isysroot %S/Inputs/basic_darwin_sdk_usr_cxx_v1 \
 // RUN:     -stdlib=platform \
 // RUN:     -nostdinc++ \
-// RUN:   | FileCheck -DSYSROOT=%S/Inputs/basic_darwin_sdk_usr \
+// RUN:   | FileCheck -DSYSROOT=%S/Inputs/basic_darwin_sdk_usr_cxx_v1 \
 // RUN:               -DTOOLCHAIN=%S/Inputs/basic_darwin_toolchain \
 // RUN:               --check-prefix=CHECK-LIBCXX-NOSTDINCXX %s
 // CHECK-LIBCXX-NOSTDINCXX: "-cc1"
